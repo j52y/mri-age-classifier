@@ -1,9 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from utils import *
-
-from tensorflow.examples.tutorials.mnist import input_data
-mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
+from scipy.ndimage.interpolation import zoom
 
 # r_range = 0.1
 i_max = 1480
@@ -11,7 +9,9 @@ train_x, train_y = load_train_data()
 
 min_age, max_age = min(train_y), max(train_y)
 
-n_row, n_col = 360, 512
+original_row, original_col = 360, 512
+original_size = original_row * original_col
+n_row, n_col = 28, 28
 n_input = n_row * n_col 
 n_output = 10 # len(set(train_y))
 
@@ -72,21 +72,20 @@ correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 sess.run(tf.initialize_all_variables())
 for i in range(20000):
+  accu = 0.0
   for j in range(len(train_x)):
-    if train_x[j].shape[0] * train_x[j].shape[1] != n_input:
+    if train_x[j].shape[0] * train_x[j].shape[1] != original_size:
       continue
-    batch_x = np.max(train_x[j].get_data(), axis=2).reshape(1, n_input) / i_max
+    batch_x = np.max(train_x[j].get_data(), axis=2)
+    batch_x = batch_x[40:320, 116:396]
+    batch_x = zoom(batch_x, 0.1)
+    batch_x = batch_x.reshape(1, n_input) / i_max
     # batch_y = np.array([[train_y[j]/(max_age - min_age)]]) 
-    batch_y = (np.arange(10)/10).reshape(-1,10)
+    # batch_y = (np.arange(10)/10).reshape(-1,10)
+    batch_y = np.zeros(10)
+    batch_y[int(train_y[j]/10)] = 1
+    print(train_y[j], batch_y)
+    batch_y = batch_y.reshape(-1,10)
     train_step.run(feed_dict={x: batch_x, y_: batch_y, keep_prob: 0.5})
-
-  if i%10 == 0:
-    batch_x = np.max(train_x[j].get_data(), axis=2).reshape(1, input_size) / i_max
-    batch_y = np.array([[train_y[j]/(max_age - min_age)]]) 
- 
-    train_accuracy = accuracy.eval(feed_dict={
-        x:train_x[100], y_: tra[1], keep_prob: 1.0})
-    print("step %d, training accuracy %g"%(i, train_accuracy))
-
-print("test accuracy %g"%accuracy.eval(feed_dict={
-    x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+    accu = y_conv.eval(feed_dict={x: batch_x, y_: batch_y, keep_prob: 0.5})
+    print(i, j, accu)
