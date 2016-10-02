@@ -110,6 +110,11 @@ saver_conv2 = tf.train.Saver({"w": W_conv2, "b": b_conv2})
 saver_conv3 = tf.train.Saver({"w": W_conv3, "b": b_conv3})
 saver_fc = tf.train.Saver({"w1": W_fc1, "b1": b_fc1, "w2": W_fc2, "b2": b_fc2, "w3": W_fc3, "b3": b_fc3})
 
+saver_conv1.restore(sess, "./tmp/model_conv1.ckpt")
+saver_conv2.restore(sess, "./tmp/model_conv2.ckpt")
+saver_conv3.restore(sess, "./tmp/model_conv3.ckpt")
+saver_fc.restore(sess, "./tmp/model_fc.ckpt")
+
 for i in range(20000):
   err = 0.0
   accu = 0.0
@@ -130,6 +135,7 @@ for i in range(20000):
     pred = t[2] 
     print(i, j, err, pred)
 
-    saver_conv1.save(sess, "./tmp/model_conv1.ckpt")
-    saver_conv2.save(sess, "./tmp/model_conv2.ckpt")
-    saver_fc.save(sess, "./tmp/model_fc.ckpt")
+  saver_conv1.save(sess, "./tmp/model_conv1.ckpt")
+  saver_conv2.save(sess, "./tmp/model_conv2.ckpt")
+  saver_conv3.save(sess, "./tmp/model_conv3.ckpt")
+  saver_fc.save(sess, "./tmp/model_fc.ckpt")
