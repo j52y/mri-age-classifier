@@ -1,3 +1,4 @@
+import os
 import math
 import numpy as np
 import tensorflow as tf
@@ -42,10 +43,18 @@ def max_pool_2x2(x):
   return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                         strides=[1, 2, 2, 1], padding='SAME')
 
+
 def max_pool_2x2x2(x):
   return tf.nn.max_pool3d(x, ksize=[1, p, p, p, 1], 
                         strides=[1, p, p, p, 1], padding='SAME')
 
+
+def restore(saver, sess, name=''):
+  fname = "./tmp/model_" + name + ".ckpt"
+  if os.path.isfile(fname):
+    saver.restore(sess, fname)
+
+ 
 with tf.device('/cpu:0'):
   x = tf.placeholder(tf.float32, shape=[None, d])
   y_ = tf.placeholder(tf.float32, shape=[None, n_output])
@@ -89,19 +98,8 @@ with tf.device('/cpu:0'):
   error = tf.sqrt(tf.reduce_mean(tf.square(tf.sub(y_, y_conv))))
 
 with tf.device('/gpu:0'):
-# W_conv3 = weight_variable([5, 5, 64, 128])
-# b_conv3 = bias_variable([128])
-# 
-# h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
-# h_pool3 = max_pool_5x5(h_conv3)
+  train_step = tf.train.GradientDescentOptimizer(0.5).minimize(error)
 
-# input = (1, 90, 128, 54)
-# h1_poo1.shape = (1, 45, 64, 27, 32) 
-# h2_poo2.shape = (1, 23, 32, 14, 64)
- 
-  train_step = tf.train.GradientDescentOptimizer(1).minimize(error)
-
-# sess = tf.InteractiveSession()
 sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 sess.run(tf.initialize_all_variables())
 
@@ -110,10 +108,10 @@ saver_conv2 = tf.train.Saver({"w": W_conv2, "b": b_conv2})
 saver_conv3 = tf.train.Saver({"w": W_conv3, "b": b_conv3})
 saver_fc = tf.train.Saver({"w1": W_fc1, "b1": b_fc1, "w2": W_fc2, "b2": b_fc2, "w3": W_fc3, "b3": b_fc3})
 
-saver_conv1.restore(sess, "./tmp/model_conv1.ckpt")
-saver_conv2.restore(sess, "./tmp/model_conv2.ckpt")
-saver_conv3.restore(sess, "./tmp/model_conv3.ckpt")
-saver_fc.restore(sess, "./tmp/model_fc.ckpt")
+restore(saver_conv1, sess, name='conv1')
+restore(saver_conv2, sess, name='conv2')
+restore(saver_conv3, sess, name='conv3')
+restore(saver_fc, sess, name='fc')
 
 for i in range(20000):
   err = 0.0
