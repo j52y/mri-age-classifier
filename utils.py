@@ -26,7 +26,7 @@ def __data_img(num):
 
 
 def data_ages():
-  f = open(meta_file)
+  f = open(meta_file, encoding='utf-8')
   reader = csv.reader(f)
   header = next(reader, None)
   age_index = header.index('age')
