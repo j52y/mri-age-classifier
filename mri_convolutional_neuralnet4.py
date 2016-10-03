@@ -10,18 +10,13 @@ train_x, train_y = load_train_data()
 
 min_age, max_age = min(train_y), max(train_y)
 
-dn = 1.3
+dn = 4
 o0, o1, o2 = 300, 300, 200 #360, 512, 216
 d0, d1, d2 = round(o0/dn), round(o1/dn), round(o2/dn)
 d = d0 * d1 * d2
 
 n_output = 1 
 p = 3 # stride size in pooling layer
-
-def input_shape(x):
-  s = x.shape
-  l0, l1, l2 = (s[0]-o0)/2, (s[1]-o1)/2, (s[2]-o2)/2
-  return x[l0:l0+o0, l1:l1+o1, l2:l2+o2]
 
 
 def weight_variable(shape):
@@ -127,7 +122,7 @@ for i in range(20000):
   for j in range(len(train_x)):
     err = 0.0
     shape = train_x[j].shape
-    batch_x = input_shape(train_x[j].get_data())
+    batch_x = image_crop(train_x[j].get_data(), [o0, o1, o2])
     batch_x = zoom(batch_x, 1/dn)
     batch_x = (batch_x.reshape(1, d) - 53) / input_max 
     batch_y = np.array([[train_y[j]]])
