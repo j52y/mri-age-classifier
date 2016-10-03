@@ -6,7 +6,7 @@ import nibabel as nib
 data_num = 111
 meta_file = './data/meta.csv'
 img_dir = './data/img/'
-incorrect_indices = [0, 11, 27]
+incorrect_indices = [0, 11, 27, 47]
 
 data_dirs = [('%03d/' % (i+1)) for i in range(data_num) if i not in incorrect_indices]
 
