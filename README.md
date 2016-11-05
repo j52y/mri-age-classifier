@@ -3,7 +3,7 @@
 Tensorflow implementation of [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/abs/1409.1556) by [Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) 
 
 
-<img src="assets/vgg_16.png" alt="vgg16" width="500">
+<img src="assets/vgg16.png" alt="vgg16" width="500">
 
 
 In order to predict ages based on 3D MRI Images, VGG network architecture is expanded to three dimensions.
